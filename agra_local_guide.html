@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agra Local Guide - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 50%, #ffd5d5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #333;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-left: 55px;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            color: #333;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn.active {
+            color: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .tab-btn.food.active {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        }
+
+        .tab-btn.travel.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .tab-btn.culture.active {
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .quick-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .question-btn {
+            text-align: left;
+            padding: 15px;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .question-btn:hover {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+            border-color: #ff6b35;
+            transform: translateY(-2px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        .submit-btn {
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #ff6b35 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .response-box {
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+            border: 2px solid #ff6b35;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .response-box.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .response-text {
+            color: #333;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 40px;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .input-wrapper {
+                flex-direction: column;
+            }
+
+            .submit-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <svg class="icon" fill="none" stroke="#dc2626" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <h1>Agra Local Guide</h1>
+            </div>
+            <p class="subtitle">आपका अपना शहर गाइड - Powered by AI 🇮🇳</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn food active" onclick="changeTab('food', event)">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                    <path d="M7 2v20"></path>
+                    <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
+                </svg>
+                Food & Dining
+            </button>
+            <button class="tab-btn travel" onclick="changeTab('travel', event)">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                Travel Tips
+            </button>
+            <button class="tab-btn culture" onclick="changeTab('culture', event)">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Culture & Slang
+            </button>
+        </div>
+
+        <!-- Quick Questions -->
+        <div class="card">
+            <h2>Quick Questions:</h2>
+            <div class="quick-questions" id="quickQuestions"></div>
+        </div>
+
+        <!-- Query Input -->
+        <div class="card">
+            <div class="input-group">
+                <label class="input-label">आपका सवाल पूछें (Ask Your Question):</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="userQuery" 
+                        class="input-field" 
+                        placeholder="जैसे: Best places for petha in Agra?"
+                        onkeypress="if(event.key==='Enter') askQuestion()"
+                    >
+                    <button class="submit-btn" id="submitBtn" onclick="askQuestion()">
+                        <span id="btnText">पूछें</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response -->
+        <div class="response-box" id="responseBox">
+            <div class="response-header">
+                <svg width="24" height="24" fill="none" stroke="#ff6b35" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Local Guide का जवाब:
+            </div>
+            <div class="response-text" id="responseText"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="font-size: 0.95em;">Built with ❤️ for AI for Bharat | Week 5 Challenge</p>
+            <p style="font-size: 0.85em; margin-top: 5px;">Powered by Kiro + Claude AI</p>
+        </div>
+    </div>
+
+    <script>
+        // Local knowledge base - Agra context
+        const agraKnowledge = {
+            food: {
+                "best petha": "Agra mein best petha ke liye aap Panchhi Petha (Sadar Bazaar) ya Bhimsain Devidayal (famous since 1857) jaa sakte ho. Different flavors milte hain - angoori, kesari, chocolate bhi! Price around ₹300-500 per kg.",
+                "breakfast": "Bhaiya, Agra mein breakfast ke liye Deviram Sweets ka Bedai-Jalebi bahut famous hai! Subah 7-10 baje jaana. Ram Babu Paranthe Wale bhi try karo. Budget: ₹100-150 per person.",
+                "mughlai": "Taj ke paas Mughlai khane ke liye 'Pinch of Spice' aur 'Joney's Place' best hain. Mutton korma, biryani, kebabs zabardast milte hain. Budget: ₹500-800 per person.",
+                "street food": "Sadar Bazaar mein Shah Market jaao - chaat, golgappe, dalmoth (spicy namkeen) famous hai. Evening time best hai, 5-8 baje. Pocket-friendly bhi hai, ₹50-100 mein pet bhar jayega!"
+            },
+            travel: {
+                "taj timing": "Taj Mahal sunrise time par sabse best lagta hai, bhaiya! 6-7 AM jaao - kam crowd, perfect light for photos. Friday ko band rehta hai. Entry: Indians ₹50, foreigners ₹1100.",
+                "fatehpur sikri": "Fatehpur Sikri Agra se 40 km door hai. Bus ya taxi se jaa sakte ho - ₹500-800 taxi return. Historical monument hai, 2-3 ghante lag jayenge dekhne mein. Subah jao, dhoop bahut hoti hai.",
+                "auto fare": "Station se Taj Mahal tak auto mein ₹100-150 lagega. Meter pe mat jaao, pehle price fix kar lo. Tourist areas mein zyada maangte hain, thoda bargain karo!",
+                "hidden spots": "Mehtab Bagh jaao - Taj ka sunset view zabardast! Sikandra (Akbar's tomb) bhi peaceful hai. Ram Barat area local vibe ke liye best hai. Bheed nahi hoti, shaanti se ghoom sakte ho."
+            },
+            culture: {
+                "markets": "Shopping ke liye Sadar Bazaar (leather goods - shoes, bags famous), Kinari Bazaar (jewelry, traditional items), aur Shah Market (street food) jaao. Bargaining zaroor karo, 30-40% discount mil sakta hai!",
+                "slang": "'Thoda adjust karo' matlab hai 'please make some space' - buses aur autos mein bahut sunta hai! 'Bhaiya/Didi' sab ek dusre ko respect se bolte hain. Local touch mil jayega isse!",
+                "handicrafts": "Agra marble inlay work (pietra dura) ke liye world famous hai - same technique jo Taj mein use hua. Leather products bhi quality mein best hain. Sadar Bazaar mein authentic shops hain.",
+                "festivals": "Taj Mahotsav (Feb-March) 10 din ka cultural festival hai - food, crafts, music! Diwali, Holi bhi grand celebration. Urs at Fatehpur Sikri bhi famous hai Sufi music lovers ke liye."
+            }
+        };
+
+        const questions = {
+            food: [
+                "Best petha shops in Agra?",
+                "Where to eat breakfast in Agra?",
+                "Famous Mughlai restaurants near Taj?",
+                "Street food places in Sadar Bazaar?"
+            ],
+            travel: [
+                "Best time to visit Taj Mahal?",
+                "How to reach Fatehpur Sikri?",
+                "Auto fare from station to Taj?",
+                "Hidden tourist spots in Agra?"
+            ],
+            culture: [
+                "Local shopping markets in Agra?",
+                "What does 'thoda adjust karo' mean?",
+                "Traditional handicrafts of Agra?",
+                "Local festivals celebrated here?"
+            ]
+        };
+
+        let currentTab = 'food';
+
+        function changeTab(tab, event) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-btn').classList.add('active');
+            
+            updateQuestions();
+        }
+
+        function updateQuestions() {
+            const container = document.getElementById('quickQuestions');
+            container.innerHTML = '';
+            
+            questions[currentTab].forEach(question => {
+                const btn = document.createElement('button');
+                btn.className = 'question-btn';
+                btn.textContent = question;
+                btn.onclick = () => {
+                    document.getElementById('userQuery').value = question;
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function getLocalResponse(query) {
+            query = query.toLowerCase();
+            
+            // Search in knowledge base
+            for (let category in agraKnowledge) {
+                for (let key in agraKnowledge[category]) {
+                    if (query.includes(key) || query.includes(key.split(' ')[0])) {
+                        return agraKnowledge[category][key];
+                    }
+                }
+            }
+            
+            // Default responses
+            if (query.includes('taj')) {
+                return "Taj Mahal dekho to sunrise time par jaao, bhaiya! 6-7 AM best hai - kam crowd aur perfect lighting. Friday ko band rehta hai. Indians ke liye ₹50 entry hai. Photos kafi ache aate hain!";
+            }
+            if (query.includes('food') || query.includes('eat')) {
+                return "Agra mein petha to famous hai hi! Bedai-Jalebi breakfast try karo Deviram Sweets pe. Mughlai khana pasand hai to Pinch of Spice jaao. Street food ke liye Shah Market (Sadar Bazaar) best hai!";
+            }
+            if (query.includes('market') || query.includes('shopping')) {
+                return "Shopping ke liye Sadar Bazaar (leather items), Kinari Bazaar (jewelry), aur Shah Market (street food) jaao. Bargaining zaroor karo - 30-40% discount mil sakta hai!";
+            }
+            
+            return "Arre bhaiya, Agra mein bahut kuch hai dekhne ko! Taj Mahal, Agra Fort, Fatehpur Sikri famous hai. Petha zaroor try karna, aur Bedai-Jalebi breakfast miss mat karna. Koi specific cheez ke baare mein jaanna hai to pucho!";
+        }
+
+        function askQuestion() {
+            const query = document.getElementById('userQuery').value.trim();
+            if (!query) return;
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const responseBox = document.getElementById('responseBox');
+            const responseText = document.getElementById('responseText');
+
+            // Show loading
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<span class="loader"></span> Loading...';
+
+            // Simulate API delay for realistic feel
+            setTimeout(() => {
+                const response = getLocalResponse(query);
+                responseText.textContent = response;
+                responseBox.classList.add('show');
+                
+                // Reset button
+                submitBtn.disabled = false;
+                btnText.textContent = 'पूछें';
+            }, 800);
+        }
+
+        // Initialize questions on load
+        updateQuestions();
+    </script>
+</body>
+</html>
